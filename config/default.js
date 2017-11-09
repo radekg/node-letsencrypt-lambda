@@ -7,7 +7,9 @@ const config = process.env.USE_ENVIRONMENT ?
     "s3-account-bucket": process.env.S3_ACCOUNT_BUCKET,
     "s3-cert-bucket": process.env.S3_CERT_BUCKET,
     "s3-folder": process.env.S3_CERT_FOLDER,
-    "certificate-info": JSON.parse(process.env.S3_CERT_INFO),
+    "certificate-info": JSON.parse(process.env.S3_CERT_INFO_BASE64
+      ? new Buffer(process.env.S3_CERT_INFO, 'base64').toString('ascii')
+      : process.env.S3_CERT_INFO),
     "acme-dns-retry": 30,
     "acme-dns-retry-delay-ms": 2000,
     "acme-account-file": process.env.ACCOUNT_PATH,
