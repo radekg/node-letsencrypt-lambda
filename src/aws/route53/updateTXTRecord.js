@@ -1,6 +1,6 @@
 const getRoute53 = require('../sdk/getRoute53')
 
-const updateTXTRecord = (hostedZoneId, domain, digest) => {
+const updateTXTRecord = (hostedZoneId, domain, digests) => {
   const toSend = {
     ChangeBatch: {
       Changes: [
@@ -9,12 +9,12 @@ const updateTXTRecord = (hostedZoneId, domain, digest) => {
           ResourceRecordSet: {
             Name: `_acme-challenge.${domain}`,
             Type: 'TXT',
-            ResourceRecords: [ { Value: JSON.stringify(digest) } ],
+            ResourceRecords: digests.map(digest => ({Value: JSON.stringify(digest)})),
             TTL: 1
           }
         }
       ],
-      Comment: 'This value is a computed digest of the token received from the LetsEncrypt challenge.'
+      Comment: 'This value is a computed digest of the token received from the ACME challenge.'
     },
     HostedZoneId: hostedZoneId
   }

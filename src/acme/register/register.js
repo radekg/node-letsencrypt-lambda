@@ -1,9 +1,6 @@
 const sendSignedRequest = require('../sendSignedRequest')
-
-const toAgreement = (links) => {
-  const match = /.*<(.*)>;rel="terms-of-service".*/.exec(links)
-  return (Array.isArray(match) ? {agreement: match[1]} : {})
-}
+const config = require('../../../config')
+const toAgreement = require('../toAgreement')
 
 const sendRefresh = (registration) =>
   sendSignedRequest({
@@ -14,7 +11,7 @@ const sendRefresh = (registration) =>
 const checkRefresh = (registration) => (data) => {
   const refreshedAgreement = toAgreement(data.header['link'])
   return ((registration.agreement !== refreshedAgreement.agreement)
-    ? refreshRegistration({
+    ? refreshRegistration({ //NOSONAR
       keypair: registration.keypair,
       location: registration.location,
       agreement: refreshedAgreement.agreement
@@ -28,14 +25,14 @@ const checkRefresh = (registration) => (data) => {
 
 const refreshRegistration = (registration) =>
   sendRefresh(registration)
-  .then(checkRefresh(registration))
+  .then(checkRefresh(registration)) //NOSONAR
 
-const register = (regUrl, email) => (keypair) =>
+const register = regUrl => keypair =>
   sendSignedRequest({
     resource: 'new-reg',
-    contact: [ `mailto:${email}` ]
+    contact: [ `mailto:${config['acme-account-email']}` ]
   }, keypair, regUrl)
-  .then((data) =>
+  .then(data =>
     refreshRegistration(
       Object.assign({
         keypair: keypair,
